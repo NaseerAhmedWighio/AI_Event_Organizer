@@ -1,0 +1,326 @@
+@import "tailwindcss";
+
+/* ============================================
+   PROFESSIONAL SAAS COLOR SYSTEM (HSL Format)
+   Inspired by Stripe, Vercel, Linear
+   ============================================ */
+
+:root {
+  /* Layout */
+  --navbar-height: 4rem; /* 64px - matches navbar h-16 */
+
+  /* Background layers */
+  --background: 0 0% 100%;
+  --foreground: 222 47% 11%;
+  
+  /* Surface layers (cards, popovers) */
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  
+  /* Brand colors - Primary */
+  --primary: 243 75% 59%;
+  --primary-foreground: 0 0% 100%;
+  --primary-hover: 243 76% 51%;
+  --primary-muted: 243 75% 96%;
+  
+  /* Secondary brand */
+  --secondary: 187 95% 43%;
+  --secondary-foreground: 0 0% 100%;
+  --secondary-hover: 187 95% 35%;
+  --secondary-muted: 187 95% 96%;
+  
+  /* Muted backgrounds (subtle surfaces) */
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
+  
+  /* Accent (highlights, badges) */
+  --accent: 210 40% 96%;
+  --accent-foreground: 222 47% 11%;
+  
+  /* Semantic states */
+  --success: 142 76% 36%;
+  --success-foreground: 0 0% 100%;
+  --success-muted: 142 76% 96%;
+  
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 100%;
+  --warning-muted: 38 92% 96%;
+  
+  --danger: 0 84% 60%;
+  --danger-foreground: 0 0% 100%;
+  --danger-muted: 0 84% 96%;
+  
+  --info: 217 91% 60%;
+  --info-foreground: 0 0% 100%;
+  --info-muted: 217 91% 96%;
+  
+  /* Interactive elements */
+  --border: 214 32% 91%;
+  --border-hover: 214 32% 85%;
+  --input: 214 32% 91%;
+  --ring: 243 75% 59%;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.08);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.08);
+  
+  /* Radius */
+  --radius: 0.75rem;
+  
+  /* Chart colors */
+  --chart-1: 243 75% 59%;
+  --chart-2: 187 95% 43%;
+  --chart-3: 271 81% 63%;
+  --chart-4: 38 92% 50%;
+  --chart-5: 142 76% 36%;
+}
+
+.dark {
+  /* Background layers - elevated dark */
+  --background: 222 47% 8%;
+  --foreground: 210 40% 98%;
+  
+  /* Surface layers - subtle elevation */
+  --card: 222 47% 11%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222 47% 11%;
+  --popover-foreground: 210 40% 98%;
+  
+  /* Brand colors - optimized for dark */
+  --primary: 243 76% 68%;
+  --primary-foreground: 0 0% 100%;
+  --primary-hover: 243 76% 75%;
+  --primary-muted: 243 76% 15%;
+  
+  --secondary: 187 95% 52%;
+  --secondary-foreground: 222 47% 8%;
+  --secondary-hover: 187 95% 60%;
+  --secondary-muted: 187 95% 15%;
+  
+  /* Muted backgrounds */
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+  
+  /* Accent */
+  --accent: 217 33% 17%;
+  --accent-foreground: 210 40% 98%;
+  
+  /* Semantic states */
+  --success: 142 70% 55%;
+  --success-foreground: 222 47% 8%;
+  --success-muted: 142 70% 15%;
+  
+  --warning: 38 92% 60%;
+  --warning-foreground: 222 47% 8%;
+  --warning-muted: 38 92% 15%;
+  
+  --danger: 0 84% 68%;
+  --danger-foreground: 0 0% 100%;
+  --danger-muted: 0 84% 15%;
+  
+  --info: 217 91% 70%;
+  --info-foreground: 222 47% 8%;
+  --info-muted: 217 91% 15%;
+  
+  /* Interactive elements */
+  --border: 217 33% 22%;
+  --border-hover: 217 33% 28%;
+  --input: 217 33% 22%;
+  --ring: 243 76% 68%;
+  
+  /* Shadows - darker for depth */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+}
+
+@theme inline {
+  /* Color tokens */
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
+  --color-success-muted: hsl(var(--success-muted));
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
+  --color-warning-muted: hsl(var(--warning-muted));
+  --color-danger: hsl(var(--danger));
+  --color-danger-foreground: hsl(var(--danger-foreground));
+  --color-danger-muted: hsl(var(--danger-muted));
+  --color-info: hsl(var(--info));
+  --color-info-foreground: hsl(var(--info-foreground));
+  --color-info-muted: hsl(var(--info-muted));
+  --color-border: hsl(var(--border));
+  --color-border-hover: hsl(var(--border-hover));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  /* Spacing tokens */
+  --spacing-navbar: var(--navbar-height);
+  
+  /* Chart colors */
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+  
+  /* Radius */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  
+  /* Fonts */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Smooth theme transitions */
+  *, *::before, *::after {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: ease;
+    transition-duration: 150ms;
+  }
+}
+
+/* ============================================
+   GRADIENT ANIMATIONS
+   ============================================ */
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient 8s ease infinite;
+}
+
+/* ============================================
+   GLASS MORPHISM
+   ============================================ */
+
+.glass {
+  background: hsla(var(--background), 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid hsla(var(--border), 0.5);
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/30 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/50;
+}
+
+/* ============================================
+   FOCUS VISIBLE STYLES
+   ============================================ */
+
+:focus-visible {
+  @apply outline-none ring-2 ring-ring ring-offset-2;
+  ring-offset-color: hsl(var(--background));
+}
+
+/* ============================================
+   SELECTION STYLES
+   ============================================ */
+
+::selection {
+  @apply bg-primary/20 text-foreground;
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   RESPONSIVE UTILITIES
+   ============================================ */
+
+/* Prevent horizontal scroll on all pages */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Ensure proper box-sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Touch-friendly minimum tap targets */
+@media (max-width: 768px) {
+  button, a, input[type="button"], input[type="submit"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Better text rendering on mobile */
+@media (max-width: 768px) {
+  body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+}

@@ -1,0 +1,432 @@
+"use client";
+
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { useUser, UserButton, SignInButton } from "@clerk/nextjs";
+import {
+  Calendar,
+  Sparkles,
+  BarChart3,
+  Clock,
+  Users,
+  CheckCircle,
+  ArrowRight,
+  Zap,
+  Shield,
+  Globe,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-provider";
+import { DotBackground } from "@/components/ui/grid-background";
+import { ReviewsSection } from "@/components/landing/reviews-section";
+
+const features = [
+  {
+    icon: Sparkles,
+    title: "AI-Powered Planning",
+    description:
+      "Get intelligent event suggestions, optimized schedules, and smart recommendations powered by advanced AI.",
+  },
+  {
+    icon: Calendar,
+    title: "Smart Scheduling",
+    description:
+      "Automatically find the best time slots, avoid conflicts, and coordinate with attendees seamlessly.",
+  },
+  {
+    icon: BarChart3,
+    title: "Analytics Dashboard",
+    description:
+      "Track event performance, attendance trends, and get insights to improve future events.",
+  },
+  {
+    icon: Clock,
+    title: "Time Optimization",
+    description:
+      "AI analyzes your event to suggest optimal timing for each activity and break.",
+  },
+  {
+    icon: Users,
+    title: "Guest Management",
+    description:
+      "Get AI suggestions for guest lists and manage attendees with ease.",
+  },
+  {
+    icon: CheckCircle,
+    title: "Task Automation",
+    description:
+      "Automated checklists and reminders ensure nothing falls through the cracks.",
+  },
+];
+
+const stats = [
+  { value: "10,000+", label: "Events Planned" },
+  { value: "500K+", label: "Attendees Managed" },
+  { value: "98%", label: "Satisfaction Rate" },
+  { value: "50M+", label: "Time Saved (hrs)" },
+];
+
+export default function LandingPage() {
+  const { isLoaded, isSignedIn, user } = useUser();
+
+  return (
+    <div className="min-h-screen">
+      {/* Navigation - Transparent over hero with iOS blur */}
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-gray-200/20 dark:border-white/10 bg-indigo-500/[0.05] backdrop-blur-2xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-indigo-600 to-cyan-500 flex items-center justify-center">
+                <Calendar className="h-5 w-5 text-white" />
+              </div>
+              <span className="font-bold text-xl bg-gradient-to-r from-indigo-600 to-cyan-500 bg-clip-text text-transparent">
+                AI Event Organizer
+              </span>
+            </Link>
+            <div className="flex items-center gap-4">
+              <ThemeToggle />
+              {isLoaded && isSignedIn ? (
+                <>
+                  <Link href="/dashboard">
+                    <Button variant="ghost" className="text-gray-700 dark:text-gray-300">Dashboard</Button>
+                  </Link>
+                  <div className="hidden sm:flex flex-col items-end">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {user?.firstName && user?.lastName
+                        ? `${user.firstName} ${user.lastName}`
+                        : user?.username || user?.emailAddresses[0]?.emailAddress}
+                    </span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {user?.emailAddresses[0]?.emailAddress}
+                    </span>
+                  </div>
+                  <UserButton
+                    appearance={{
+                      elements: {
+                        avatarBox: "w-9 h-9 rounded-xl",
+                        userButtonPopoverCard: "rounded-xl",
+                      },
+                    }}
+                  />
+                </>
+              ) : (
+                <>
+                  <SignInButton mode="modal">
+                    <Button variant="ghost" className="text-gray-700 dark:text-gray-300">Sign In</Button>
+                  </SignInButton>
+                  <Link href="/sign-up">
+                    <Button>Get Started</Button>
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section with Dot Background */}
+      <DotBackground
+        dotSize={1}
+        dotColor="#c7d2fe"
+        darkDotColor="#312e81"
+        spacing={25}
+        showFade={false}
+        className="min-h-screen w-full"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center justify-center min-h-screen pt-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-100 to-cyan-100 dark:from-indigo-900/30 dark:to-cyan-900/30 text-sm font-medium mb-6">
+              <Zap className="h-4 w-4 text-indigo-600" />
+              <span className="bg-gradient-to-r from-indigo-600 to-cyan-500 bg-clip-text text-transparent">
+                AI-Powered Event Planning
+              </span>
+            </div>
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
+              Plan Events{" "}
+              <span className="bg-gradient-to-r from-indigo-600 to-cyan-500 bg-clip-text text-transparent animate-gradient">
+                Smarter
+              </span>
+              <br />
+              Not Harder
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-10">
+              Transform your event planning with AI-powered suggestions, smart
+              scheduling, and intelligent analytics. Create memorable events in
+              minutes, not weeks.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/sign-up">
+                <Button size="lg" className="text-base px-8 h-12">
+                  Start Planning Free
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+              <Link href="#how-it-works">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="text-base px-8 h-12"
+                >
+                  See How It Works
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+
+          {/* Hero Image/Mockup */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="mt-16 relative"
+          >
+            <div className="relative mx-auto max-w-5xl">
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-3xl blur-3xl opacity-20 animate-gradient" />
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-800">
+                <div className="aspect-video bg-gradient-to-br from-indigo-600 via-purple-600 to-cyan-600 p-1">
+                  <div className="h-full w-full rounded-[22px] bg-white dark:bg-gray-900 flex items-center justify-center">
+                    <div className="text-center p-8">
+                      <Calendar className="h-20 w-20 mx-auto text-indigo-600 mb-4" />
+                      <p className="text-xl font-semibold mb-2">
+                        Dashboard Preview
+                      </p>
+                      <p className="text-gray-500">
+                        Your events, AI insights, and analytics in one place
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </DotBackground>
+
+      {/* Stats Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 border-y border-gray-200 dark:border-gray-800 bg-white/50 dark:bg-gray-900/50">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="text-center"
+              >
+                <div className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-indigo-600 to-cyan-500 bg-clip-text text-transparent mb-2">
+                  {stat.value}
+                </div>
+                <div className="text-gray-600 dark:text-gray-400 font-medium">
+                  {stat.label}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="features" className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl font-bold mb-4">
+              Everything You Need to{" "}
+              <span className="bg-gradient-to-r from-indigo-600 to-cyan-500 bg-clip-text text-transparent">
+                Plan Perfect Events
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              Powerful features powered by AI to make event planning effortless
+              and enjoyable.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="group p-8 rounded-3xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-indigo-500 dark:hover:border-indigo-500 transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10"
+              >
+                <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-600 to-cyan-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <feature.icon className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                  {feature.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section
+        id="how-it-works"
+        className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-indigo-600 via-purple-600 to-cyan-600"
+      >
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
+              How It Works
+            </h2>
+            <p className="text-xl text-indigo-100 max-w-2xl mx-auto">
+              Get started in minutes and plan your first AI-powered event today.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                step: "01",
+                title: "Create Your Event",
+                description:
+                  "Enter basic details about your event - type, date, location, and expected attendees.",
+              },
+              {
+                step: "02",
+                title: "AI Generates Plan",
+                description:
+                  "Our AI creates a comprehensive plan with schedule, budget, suggestions, and checklists.",
+              },
+              {
+                step: "03",
+                title: "Execute & Optimize",
+                description:
+                  "Follow your plan, track progress, and get real-time suggestions for improvements.",
+              },
+            ].map((item, index) => (
+              <motion.div
+                key={item.step}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.2 }}
+                className="relative p-8 rounded-3xl bg-white/10 backdrop-blur-lg border border-white/20"
+              >
+                <div className="text-6xl font-bold text-white/20 mb-4">
+                  {item.step}
+                </div>
+                <h3 className="text-2xl font-semibold text-white mb-3">
+                  {item.title}
+                </h3>
+                <p className="text-indigo-100 leading-relaxed">
+                  {item.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section - Dynamic Reviews */}
+      <ReviewsSection />
+
+      {/* CTA Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="relative p-12 rounded-[3rem] bg-gradient-to-br from-indigo-600 via-purple-600 to-cyan-600 overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+            <div className="relative text-center">
+              <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+                Ready to Plan Your First Event?
+              </h2>
+              <p className="text-xl text-indigo-100 mb-10 max-w-2xl mx-auto">
+                Join thousands of event planners who save time and create better
+                events with AI.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Link href="/sign-up">
+                  <Button
+                    size="lg"
+                    className="text-base px-8 h-12 bg-white text-indigo-600 hover:bg-gray-100"
+                  >
+                    Get Started Free
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link href="/dashboard">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="text-base px-8 h-12 border-white text-white hover:bg-white/10"
+                  >
+                    View Demo
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-gray-200 dark:border-gray-800">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <Link href="/" className="flex items-center gap-2 mb-4">
+                <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-indigo-600 to-cyan-500 flex items-center justify-center">
+                  <Calendar className="h-5 w-5 text-white" />
+                </div>
+                <span className="font-bold text-lg">AI Event Organizer</span>
+              </Link>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                Plan smarter events with AI-powered insights and automation.
+              </p>
+            </div>
+            {[
+              {
+                title: "Product",
+                links: ["Features", "Pricing", "Integrations", "Changelog"],
+              },
+              {
+                title: "Resources",
+                links: ["Documentation", "Guides", "Blog", "Support"],
+              },
+              {
+                title: "Company",
+                links: ["About", "Careers", "Privacy", "Terms"],
+              },
+            ].map((section) => (
+              <div key={section.title}>
+                <h4 className="font-semibold mb-4">{section.title}</h4>
+                <ul className="space-y-2">
+                  {section.links.map((link) => (
+                    <li key={link}>
+                      <a
+                        href="#"
+                        className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 text-sm transition-colors"
+                      >
+                        {link}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <div className="pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              © {new Date().getFullYear()} AI Event Organizer. All rights reserved.
+            </p>
+            <div className="flex items-center gap-4">
+              <Shield className="h-5 w-5 text-gray-400" />
+              <Globe className="h-5 w-5 text-gray-400" />
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}

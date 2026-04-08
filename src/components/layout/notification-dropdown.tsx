@@ -32,7 +32,7 @@ export function NotificationDropdown() {
     markAllAsRead,
     deleteNotification,
   } = useNotifications({
-    clerkId: user?.id || "",
+    userId: user?.id || "",
     enabled: !!user,
     enableRealTime: true,
   });

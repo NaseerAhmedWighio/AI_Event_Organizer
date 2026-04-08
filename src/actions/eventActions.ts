@@ -29,7 +29,7 @@ const createEventSchema = z.object({
   attendees: z.array(z.string().email("Invalid email address")).optional(),
   budget: z.string().optional(),
   category: z.string().optional(),
-  clerkId: z.string().min(1, "User ID is required"),
+  userId: z.string().min(1, "User ID is required"),
 });
 
 export type CreateEventInput = z.infer<typeof createEventSchema>;
@@ -87,7 +87,7 @@ export async function createEvent(input: CreateEventInput): Promise<ActionResult
       location: validatedData.location,
       status: validatedData.status || "upcoming",
       attendees: validatedData.attendees || [],
-      createdBy: validatedData.clerkId,
+      createdBy: validatedData.userId,
       budget: validatedData.budget,
       category: validatedData.category || "other",
     };

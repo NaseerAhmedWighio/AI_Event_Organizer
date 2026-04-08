@@ -137,7 +137,7 @@ export function useAuth() {
   return context;
 }
 
-// Alias for easier migration from Clerk
+// Standard user hook that matches common patterns
 export function useUser() {
   const { user, isLoading, isSignedIn } = useAuth();
   return {

@@ -25,7 +25,7 @@ export interface NotificationStats {
 }
 
 interface UseNotificationsOptions {
-  clerkId: string;
+  userId: string;
   enabled?: boolean;
   enableRealTime?: boolean;
   autoMarkAsRead?: boolean;
@@ -70,11 +70,11 @@ const NOTIFICATION_TYPE_COLORS: Record<string, string> = {
  * - Delete notifications
  * - Notification stats (total, unread, read)
  *
- * @param options - Configuration including clerkId and fetch options
+ * @param options - Configuration including userId and fetch options
  * @returns Notifications, stats, and management functions
  */
 export function useNotifications({
-  clerkId,
+  userId,
   enabled = true,
   enableRealTime = true,
   autoMarkAsRead = false,
@@ -101,11 +101,11 @@ export function useNotifications({
   }, []);
 
   const fetchNotifications = useCallback(async () => {
-    if (!clerkId || !enabled) return;
+    if (!userId || !enabled) return;
 
     setIsLoading(true);
     try {
-      const query = `*[_type == "notification" && userId == $clerkId] {
+      const query = `*[_type == "notification" && userId == $userId] {
         _id,
         _createdAt,
         userId,
@@ -120,7 +120,7 @@ export function useNotifications({
         createdAt
       } | order(createdAt desc)`;
 
-      const fetchedNotifications = await client.fetch(query, { clerkId });
+      const fetchedNotifications = await client.fetch(query, { userId });
       processNotifications(fetchedNotifications);
       setError(null);
     } catch (err) {
@@ -129,7 +129,7 @@ export function useNotifications({
     } finally {
       setIsLoading(false);
     }
-  }, [clerkId, enabled, processNotifications]);
+  }, [userId, enabled, processNotifications]);
 
   const markAsRead = useCallback(async (notificationId: string) => {
     try {
@@ -164,7 +164,7 @@ export function useNotifications({
       const response = await fetch('/api/notifications/mark-all-read', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: clerkId }),
+        body: JSON.stringify({ userId }),
       });
 
       if (!response.ok) {
@@ -177,7 +177,7 @@ export function useNotifications({
       console.error("Error marking all notifications as read:", err);
       throw err;
     }
-  }, [notifications, clerkId]);
+  }, [notifications, userId]);
 
   const deleteNotification = useCallback(async (notificationId: string) => {
     try {
@@ -204,7 +204,7 @@ export function useNotifications({
 
   // Real-time subscription
   useEffect(() => {
-    if (!enableRealTime || !clerkId || !enabled) {
+    if (!enableRealTime || !userId || !enabled) {
       setHasRealTime(false);
       return;
     }
@@ -214,8 +214,8 @@ export function useNotifications({
     const setupSubscription = () => {
       try {
         const observable = client.listen(
-          `*[_type == "notification" && userId == $clerkId]`,
-          { clerkId },
+          `*[_type == "notification" && userId == $userId]`,
+          { userId },
           {
             includeResult: true,
             visibility: "query",
@@ -248,7 +248,7 @@ export function useNotifications({
         subscription.unsubscribe();
       }
     };
-  }, [clerkId, enabled, enableRealTime, fetchNotifications]);
+  }, [userId, enabled, enableRealTime, fetchNotifications]);
 
   return {
     notifications,

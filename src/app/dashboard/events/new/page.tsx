@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/AuthContext";
 import { createEvent } from "@/actions/eventActions";
+import { createAIPlan } from "@/actions/aiPlanActions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,7 +45,8 @@ export default function CreateEventPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
-  
+  const [generateAIPlan, setGenerateAIPlan] = useState(false);
+
   // Form state to preserve data on errors
   const [formData, setFormData] = useState({
     title: "",
@@ -169,6 +171,39 @@ export default function CreateEventPage() {
       const result = await createEvent(eventData);
 
       if (result.success && result.data) {
+        // Generate AI plan if requested
+        if (generateAIPlan) {
+          toast.info("Generating AI Plan...", {
+            description: "Our AI is creating a personalized plan for your event.",
+            duration: 3000,
+          });
+
+          try {
+            const aiPlanResult = await createAIPlan({
+              eventId: result.data._id,
+              eventTitle: formData.title,
+              eventDescription: formData.description,
+              eventDate: formData.date,
+              location: formData.location,
+              category: formData.category,
+              expectedAttendees: 0,
+            });
+
+            if (aiPlanResult.success) {
+              toast.success("AI Plan Generated! ✨", {
+                description: "Your personalized event plan is ready.",
+                duration: 4000,
+              });
+            }
+          } catch (aiError) {
+            console.error("AI plan generation error:", aiError);
+            toast.error("AI Plan Generation Failed", {
+              description: aiError instanceof Error ? aiError.message : "You can generate it later from the event page.",
+              duration: 5000,
+            });
+          }
+        }
+
         // Show success toast with celebration
         toast.success("Event Created Successfully! 🎉", {
           description: `${eventData.title} has been added to your dashboard.`,
@@ -402,6 +437,28 @@ export default function CreateEventPage() {
                 className="rounded-xl h-12 transition-all focus:ring-2 focus:ring-indigo-500"
               />
               <p className="text-xs text-gray-500">Enter your estimated budget for this event</p>
+            </div>
+
+            {/* AI Plan Generation Checkbox */}
+            <div className="p-4 rounded-xl bg-gradient-to-r from-indigo-50 to-cyan-50 dark:from-indigo-950/20 dark:to-cyan-950/20 border border-indigo-100 dark:border-indigo-900/30">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={generateAIPlan}
+                  onChange={(e) => setGenerateAIPlan(e.target.checked)}
+                  className="mt-0.5 h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                  disabled={isDisabled}
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                    <span className="font-medium text-sm">Generate AI Plan Automatically</span>
+                  </div>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                    Let our AI create a personalized event plan with schedule, budget, checklist, and more.
+                  </p>
+                </div>
+              </label>
             </div>
 
             {/* Action Buttons */}

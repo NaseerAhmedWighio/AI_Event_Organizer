@@ -5,10 +5,10 @@ export default {
   fields: [
     {
       name: "userId",
-      title: "User ID (Clerk)",
+      title: "User ID",
       type: "string",
       validation: (Rule: any) => Rule.required(),
-      description: "Clerk user ID who wrote the review",
+      description: "User ID who wrote the review",
     },
     {
       name: "userName",

@@ -75,16 +75,16 @@ export interface AttendeeGrowthData {
 
 /**
  * Fetch comprehensive analytics data for a user
- * @param clerkId - The Clerk user ID
+ * @param userId - The Clerk user ID
  * @returns Analytics data or error
  */
-export async function getAnalyticsData(clerkId: string): Promise<{
+export async function getAnalyticsData(userId: string): Promise<{
   success: boolean;
   data?: AnalyticsData;
   error?: string;
 }> {
   try {
-    if (!clerkId) {
+    if (!userId) {
       return {
         success: false,
         error: "User ID is required",
@@ -99,12 +99,12 @@ export async function getAnalyticsData(clerkId: string): Promise<{
       recentActivity,
       topCategories,
     ] = await Promise.all([
-      client.fetch(getEventStatsQuery, { clerkId }),
-      client.fetch(getEventsByStatusQuery, { clerkId }),
-      client.fetch(getEventsByCategoryQuery, { clerkId }),
-      client.fetch(getMonthlyEventTrendsQuery, { clerkId }),
-      client.fetch(getRecentActivityQuery, { clerkId }),
-      client.fetch(getTopCategoriesQuery, { clerkId }),
+      client.fetch(getEventStatsQuery, { userId }),
+      client.fetch(getEventsByStatusQuery, { userId }),
+      client.fetch(getEventsByCategoryQuery, { userId }),
+      client.fetch(getMonthlyEventTrendsQuery, { userId }),
+      client.fetch(getRecentActivityQuery, { userId }),
+      client.fetch(getTopCategoriesQuery, { userId }),
     ]);
 
     return {
@@ -142,10 +142,10 @@ export async function getAnalyticsData(clerkId: string): Promise<{
 
 /**
  * Fetch dashboard stats only (lightweight query)
- * @param clerkId - The Clerk user ID
+ * @param userId - The Clerk user ID
  * @returns Dashboard stats or error
  */
-export async function getDashboardStats(clerkId: string): Promise<{
+export async function getDashboardStats(userId: string): Promise<{
   success: boolean;
   data?: {
     totalEvents: number;
@@ -156,7 +156,7 @@ export async function getDashboardStats(clerkId: string): Promise<{
   error?: string;
 }> {
   try {
-    if (!clerkId) {
+    if (!userId) {
       return {
         success: false,
         error: "User ID is required",
@@ -166,13 +166,13 @@ export async function getDashboardStats(clerkId: string): Promise<{
     const stats = await client.fetch(
       `
       {
-        "totalEvents": count(*[_type == "event" && createdBy == $clerkId]),
-        "upcomingEvents": count(*[_type == "event" && createdBy == $clerkId && status == "upcoming"]),
-        "completedEvents": count(*[_type == "event" && createdBy == $clerkId && status == "completed"]),
-        "totalAIPlans": count(*[_type == "aiPlan" && event->createdBy == $clerkId])
+        "totalEvents": count(*[_type == "event" && createdBy == $userId]),
+        "upcomingEvents": count(*[_type == "event" && createdBy == $userId && status == "upcoming"]),
+        "completedEvents": count(*[_type == "event" && createdBy == $userId && status == "completed"]),
+        "totalAIPlans": count(*[_type == "aiPlan" && event->createdBy == $userId])
       }
       `,
-      { clerkId }
+      { userId }
     );
 
     return {
@@ -190,10 +190,10 @@ export async function getDashboardStats(clerkId: string): Promise<{
 
 /**
  * Fetch events by category for pie chart
- * @param clerkId - The Clerk user ID
+ * @param userId - The Clerk user ID
  * @returns Category distribution or error
  */
-export async function getCategoryDistribution(clerkId: string): Promise<{
+export async function getCategoryDistribution(userId: string): Promise<{
   success: boolean;
   data?: Array<{
     category: string;
@@ -203,7 +203,7 @@ export async function getCategoryDistribution(clerkId: string): Promise<{
   error?: string;
 }> {
   try {
-    if (!clerkId) {
+    if (!userId) {
       return {
         success: false,
         error: "User ID is required",
@@ -211,11 +211,11 @@ export async function getCategoryDistribution(clerkId: string): Promise<{
     }
 
     const events = await client.fetch(
-      `*[_type == "event" && createdBy == $clerkId && category != null] {
+      `*[_type == "event" && createdBy == $userId && category != null] {
         category,
         status
       }`,
-      { clerkId }
+      { userId }
     );
 
     const categoryMap = new Map<string, number>();
@@ -249,10 +249,10 @@ export async function getCategoryDistribution(clerkId: string): Promise<{
 
 /**
  * Fetch status distribution for pie chart
- * @param clerkId - The Clerk user ID
+ * @param userId - The Clerk user ID
  * @returns Status distribution or error
  */
-export async function getStatusDistribution(clerkId: string): Promise<{
+export async function getStatusDistribution(userId: string): Promise<{
   success: boolean;
   data?: Array<{
     status: string;
@@ -262,14 +262,14 @@ export async function getStatusDistribution(clerkId: string): Promise<{
   error?: string;
 }> {
   try {
-    if (!clerkId) {
+    if (!userId) {
       return {
         success: false,
         error: "User ID is required",
       };
     }
 
-    const stats = await client.fetch(getEventsByStatusQuery, { clerkId });
+    const stats = await client.fetch(getEventsByStatusQuery, { userId });
 
     const total =
       (stats?.upcoming || 0) + (stats?.completed || 0) + (stats?.cancelled || 0);
@@ -307,12 +307,12 @@ export async function getStatusDistribution(clerkId: string): Promise<{
 
 /**
  * Fetch monthly event trends
- * @param clerkId - The Clerk user ID
+ * @param userId - The Clerk user ID
  * @param months - Number of months to fetch (default: 12)
  * @returns Monthly trends or error
  */
 export async function getMonthlyTrends(
-  clerkId: string,
+  userId: string,
   months: number = 12
 ): Promise<{
   success: boolean;
@@ -325,7 +325,7 @@ export async function getMonthlyTrends(
   error?: string;
 }> {
   try {
-    if (!clerkId) {
+    if (!userId) {
       return {
         success: false,
         error: "User ID is required",
@@ -333,12 +333,12 @@ export async function getMonthlyTrends(
     }
 
     const events = await client.fetch(
-      `*[_type == "event" && createdBy == $clerkId] {
+      `*[_type == "event" && createdBy == $userId] {
         "month": dateTime(date).month,
         "year": dateTime(date).year,
         status
       }`,
-      { clerkId }
+      { userId }
     );
 
     // Get last N months
@@ -405,12 +405,12 @@ export async function getMonthlyTrends(
 
 /**
  * Fetch weekly event trends
- * @param clerkId - The Clerk user ID
+ * @param userId - The Clerk user ID
  * @param weeks - Number of weeks to fetch (default: 12)
  * @returns Weekly trends or error
  */
 export async function getWeeklyTrends(
-  clerkId: string,
+  userId: string,
   weeks: number = 12
 ): Promise<{
   success: boolean;
@@ -418,14 +418,14 @@ export async function getWeeklyTrends(
   error?: string;
 }> {
   try {
-    if (!clerkId) {
+    if (!userId) {
       return {
         success: false,
         error: "User ID is required",
       };
     }
 
-    const events = await client.fetch(getWeeklyEventTrendsQuery, { clerkId });
+    const events = await client.fetch(getWeeklyEventTrendsQuery, { userId });
 
     const now = new Date();
     const currentWeek = getWeekNumber(now);
@@ -474,23 +474,23 @@ export async function getWeeklyTrends(
 
 /**
  * Fetch category performance (completion rate by category)
- * @param clerkId - The Clerk user ID
+ * @param userId - The Clerk user ID
  * @returns Category performance data or error
  */
-export async function getCategoryPerformance(clerkId: string): Promise<{
+export async function getCategoryPerformance(userId: string): Promise<{
   success: boolean;
   data?: CategoryPerformanceData[];
   error?: string;
 }> {
   try {
-    if (!clerkId) {
+    if (!userId) {
       return {
         success: false,
         error: "User ID is required",
       };
     }
 
-    const events = await client.fetch(getCategoryPerformanceQuery, { clerkId });
+    const events = await client.fetch(getCategoryPerformanceQuery, { userId });
 
     const categoryMap = new Map<string, { total: number; completed: number; upcoming: number; cancelled: number }>();
 
@@ -530,23 +530,23 @@ export async function getCategoryPerformance(clerkId: string): Promise<{
 
 /**
  * Fetch attendee growth over time
- * @param clerkId - The Clerk user ID
+ * @param userId - The Clerk user ID
  * @returns Attendee growth data or error
  */
-export async function getAttendeeGrowth(clerkId: string): Promise<{
+export async function getAttendeeGrowth(userId: string): Promise<{
   success: boolean;
   data?: AttendeeGrowthData[];
   error?: string;
 }> {
   try {
-    if (!clerkId) {
+    if (!userId) {
       return {
         success: false,
         error: "User ID is required",
       };
     }
 
-    const events = await client.fetch(getAttendeeGrowthQuery, { clerkId });
+    const events = await client.fetch(getAttendeeGrowthQuery, { userId });
 
     let cumulative = 0;
     const result = events.map((event: any) => {

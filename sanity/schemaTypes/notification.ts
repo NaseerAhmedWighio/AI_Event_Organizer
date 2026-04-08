@@ -5,10 +5,10 @@ export default {
   fields: [
     {
       name: "userId",
-      title: "User ID (Clerk)",
+      title: "User ID",
       type: "string",
       validation: (Rule: any) => Rule.required(),
-      description: "Clerk user ID this notification belongs to",
+      description: "User ID this notification belongs to",
     },
     {
       name: "title",

@@ -62,7 +62,7 @@ export interface CategoryPerformance {
 }
 
 interface UseAnalyticsOptions {
-  clerkId: string;
+  userId: string;
   enabled?: boolean;
   monthsToFetch?: number;
   enableRealTime?: boolean;
@@ -108,12 +108,12 @@ const STATUS_COLORS: Record<string, string> = {
  * - Real-time updates via Sanity listen()
  * - Optional weekly trends and category performance
  * - Loading states and error handling
- * 
- * @param options - Configuration including clerkId and fetch options
+ *
+ * @param options - Configuration including userId and fetch options
  * @returns Analytics data, charts data, loading state, and refetch function
  */
 export function useAnalytics({
-  clerkId,
+  userId,
   enabled = true,
   monthsToFetch = 12,
   enableRealTime = true,
@@ -220,7 +220,7 @@ export function useAnalytics({
   );
 
   const fetchAnalytics = useCallback(async (isRefresh = false) => {
-    if (!clerkId || !enabled) return;
+    if (!userId || !enabled) return;
 
     if (isRefresh) {
       setIsRefreshing(true);
@@ -230,8 +230,8 @@ export function useAnalytics({
 
     try {
       const [fetchedStats, eventsByMonth] = await Promise.all([
-        client.fetch(getEventStatsQuery, { clerkId }),
-        client.fetch(getEventsByMonthQuery, { clerkId }),
+        client.fetch(getEventStatsQuery, { userId }),
+        client.fetch(getEventsByMonthQuery, { userId }),
       ]);
 
       processAnalyticsData(fetchedStats, eventsByMonth);
@@ -239,23 +239,23 @@ export function useAnalytics({
       // Fetch optional data
       if (includeWeekly) {
         const weeklyEvents = await client.fetch(
-          `*[_type == "event" && createdBy == $clerkId] {
+          `*[_type == "event" && createdBy == $userId] {
             "week": dateTime(date).week,
             "year": dateTime(date).year,
             status
           }`,
-          { clerkId }
+          { userId }
         );
         processWeeklyData(weeklyEvents, setWeeklyData);
       }
 
       if (includeCategoryPerformance) {
         const categoryEvents = await client.fetch(
-          `*[_type == "event" && createdBy == $clerkId && category != null] {
+          `*[_type == "event" && createdBy == $userId && category != null] {
             category,
             status
           }`,
-          { clerkId }
+          { userId }
         );
         processCategoryPerformance(categoryEvents, setCategoryPerformance);
       }
@@ -269,7 +269,7 @@ export function useAnalytics({
       setIsLoading(false);
       setIsRefreshing(false);
     }
-  }, [clerkId, enabled, processAnalyticsData, includeWeekly, includeCategoryPerformance]);
+  }, [userId, enabled, processAnalyticsData, includeWeekly, includeCategoryPerformance]);
 
   // Initial fetch
   useEffect(() => {
@@ -278,7 +278,7 @@ export function useAnalytics({
 
   // Real-time subscription
   useEffect(() => {
-    if (!enableRealTime || !clerkId || !enabled) {
+    if (!enableRealTime || !userId || !enabled) {
       setHasRealTime(false);
       return;
     }
@@ -289,7 +289,7 @@ export function useAnalytics({
       try {
         const observable = client.listen(
           analyticsRealTimeSubscriptionQuery,
-          { clerkId },
+          { userId },
           {
             includeResult: true,
             visibility: "query",
@@ -325,7 +325,7 @@ export function useAnalytics({
         subscription.unsubscribe();
       }
     };
-  }, [clerkId, enabled, enableRealTime, fetchAnalytics]);
+  }, [userId, enabled, enableRealTime, fetchAnalytics]);
 
   return {
     stats,
@@ -451,16 +451,16 @@ function getWeekNumber(date: Date): number {
  * Hook for real-time analytics updates only
  * Subscribes to event changes and triggers callback
  */
-export function useAnalyticsRealTime(clerkId: string, onUpdate?: () => void) {
+export function useAnalyticsRealTime(userId: string, onUpdate?: () => void) {
   useEffect(() => {
-    if (!clerkId) return;
+    if (!userId) return;
 
     let subscription: any;
 
     try {
       subscription = client.listen(
-        `*[_type == "event" && createdBy == $clerkId]`,
-        { clerkId },
+        `*[_type == "event" && createdBy == $userId]`,
+        { userId },
         { includeResult: true }
       );
 
@@ -481,13 +481,13 @@ export function useAnalyticsRealTime(clerkId: string, onUpdate?: () => void) {
     } catch (err) {
       console.error("Failed to set up analytics subscription:", err);
     }
-  }, [clerkId, onUpdate]);
+  }, [userId, onUpdate]);
 }
 
 /**
  * Hook for fetching only dashboard stats (lightweight)
  */
-export function useDashboardStats(clerkId: string, enabled = true) {
+export function useDashboardStats(userId: string, enabled = true) {
   const [stats, setStats] = useState<{
     totalEvents: number;
     upcomingEvents: number;
@@ -498,7 +498,7 @@ export function useDashboardStats(clerkId: string, enabled = true) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!clerkId || !enabled) {
+    if (!userId || !enabled) {
       setIsLoading(false);
       return;
     }
@@ -509,13 +509,13 @@ export function useDashboardStats(clerkId: string, enabled = true) {
         const data = await client.fetch(
           `
           {
-            "totalEvents": count(*[_type == "event" && createdBy == $clerkId]),
-            "upcomingEvents": count(*[_type == "event" && createdBy == $clerkId && status == "upcoming"]),
-            "completedEvents": count(*[_type == "event" && createdBy == $clerkId && status == "completed"]),
-            "totalAIPlans": count(*[_type == "aiPlan" && event->createdBy == $clerkId])
+            "totalEvents": count(*[_type == "event" && createdBy == $userId]),
+            "upcomingEvents": count(*[_type == "event" && createdBy == $userId && status == "upcoming"]),
+            "completedEvents": count(*[_type == "event" && createdBy == $userId && status == "completed"]),
+            "totalAIPlans": count(*[_type == "aiPlan" && event->createdBy == $userId])
           }
           `,
-          { clerkId }
+          { userId }
         );
         setStats(data);
         setError(null);
@@ -527,7 +527,7 @@ export function useDashboardStats(clerkId: string, enabled = true) {
     };
 
     fetchStats();
-  }, [clerkId, enabled]);
+  }, [userId, enabled]);
 
   return { stats, isLoading, error };
 }

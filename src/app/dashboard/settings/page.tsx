@@ -139,9 +139,9 @@ export default async function SettingsPage() {
                   <Shield className="h-4 w-4 text-white" />
                 </div>
                 <div>
-                  <p className="font-medium">Clerk Authentication</p>
+                  <p className="font-medium">Custom Authentication</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Secure authentication powered by Clerk
+                    Secure JWT-based authentication
                   </p>
                 </div>
               </div>

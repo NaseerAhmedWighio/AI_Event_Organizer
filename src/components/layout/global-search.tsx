@@ -32,17 +32,17 @@ export interface SearchResult {
 }
 
 interface UseSearchOptions {
-  clerkId: string;
+  userId: string;
   query: string;
   enabled?: boolean;
 }
 
-function useSearch({ clerkId, query, enabled = true }: UseSearchOptions) {
+function useSearch({ userId, query, enabled = true }: UseSearchOptions) {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!clerkId || !query || query.length < 2 || !enabled) {
+    if (!userId || !query || query.length < 2 || !enabled) {
       setResults([]);
       return;
     }
@@ -50,7 +50,7 @@ function useSearch({ clerkId, query, enabled = true }: UseSearchOptions) {
     const searchTimeout = setTimeout(async () => {
       setIsLoading(true);
       try {
-        const searchQuery = `*[_type in ["event", "aiPlan"] && createdBy == $clerkId && (
+        const searchQuery = `*[_type in ["event", "aiPlan"] && createdBy == $userId && (
           title match $query ||
           description match $query ||
           (type == "event" && (category match $query || location match $query))
@@ -67,7 +67,7 @@ function useSearch({ clerkId, query, enabled = true }: UseSearchOptions) {
         } | score(title match $query desc, description match $query desc) | order(_score desc) [0...10]`;
 
         const fetchedResults = await client.fetch(searchQuery, {
-          clerkId,
+          userId,
           query: `${query}*`,
         } as Record<string, unknown>);
         setResults(fetchedResults);
@@ -79,7 +79,7 @@ function useSearch({ clerkId, query, enabled = true }: UseSearchOptions) {
     }, 300);
 
     return () => clearTimeout(searchTimeout);
-  }, [clerkId, query, enabled]);
+  }, [userId, query, enabled]);
 
   return { results, isLoading };
 }
@@ -92,7 +92,7 @@ export function GlobalSearch() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { results, isLoading } = useSearch({
-    clerkId: user?.id || "",
+    userId: user?.id || "",
     query,
     enabled: isOpen,
   });

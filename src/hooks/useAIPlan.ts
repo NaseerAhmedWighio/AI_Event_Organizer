@@ -124,19 +124,19 @@ export function useAIPlan(planId: string | null): UseAIPlanReturn {
 /**
  * Hook for fetching all AI plans for a user with real-time updates
  */
-export function useAIPlans(clerkId: string | null, enabled = true) {
+export function useAIPlans(userId: string | null, enabled = true) {
   const [plans, setPlans] = useState<AIPlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const subscriptionRef = useRef<any>(null);
 
   const fetchPlans = useCallback(async () => {
-    if (!clerkId || !enabled) return;
+    if (!userId || !enabled) return;
 
     try {
       setIsLoading(true);
       const data = await client.fetch(
-        `*[_type == "aiPlan" && event->createdBy == $clerkId] {
+        `*[_type == "aiPlan" && event->createdBy == $userId] {
           _id,
           _createdAt,
           _updatedAt,
@@ -154,7 +154,7 @@ export function useAIPlans(clerkId: string | null, enabled = true) {
           guestIdeas,
           checklist
         } | order(_createdAt desc)`,
-        { clerkId }
+        { userId }
       );
       setPlans(data || []);
       setError(null);
@@ -163,7 +163,7 @@ export function useAIPlans(clerkId: string | null, enabled = true) {
     } finally {
       setIsLoading(false);
     }
-  }, [clerkId, enabled]);
+  }, [userId, enabled]);
 
   // Initial fetch
   useEffect(() => {
@@ -172,12 +172,12 @@ export function useAIPlans(clerkId: string | null, enabled = true) {
 
   // Real-time subscription
   useEffect(() => {
-    if (!clerkId || !enabled) return;
+    if (!userId || !enabled) return;
 
     try {
       subscriptionRef.current = client.listen(
-        `*[_type == "aiPlan" && event->createdBy == $clerkId]`,
-        { clerkId },
+        `*[_type == "aiPlan" && event->createdBy == $userId]`,
+        { userId },
         { includeResult: true, includePrevious: true }
       );
 
@@ -204,7 +204,7 @@ export function useAIPlans(clerkId: string | null, enabled = true) {
     } catch (err) {
       console.error("Failed to set up AI plans subscription:", err);
     }
-  }, [clerkId, enabled]);
+  }, [userId, enabled]);
 
   // Cleanup
   useEffect(() => {

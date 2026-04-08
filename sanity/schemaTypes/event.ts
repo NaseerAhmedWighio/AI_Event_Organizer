@@ -51,10 +51,10 @@ export default {
     },
     {
       name: "createdBy",
-      title: "Created By (Clerk ID)",
+      title: "Created By (User ID)",
       type: "string",
       validation: (Rule: any) => Rule.required(),
-      description: "Clerk user ID who created this event",
+      description: "User ID who created this event",
     },
     {
       name: "budget",

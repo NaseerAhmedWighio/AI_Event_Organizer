@@ -207,6 +207,7 @@ export function AIPlanSection({ eventId, event }: AIPlanSectionProps) {
           {plan.checklist && plan.checklist.length > 0 && (
             <ChecklistManager
               planId={plan._id}
+              eventId={eventId}
               checklist={plan.checklist}
             />
           )}

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useUser } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import {
@@ -86,8 +87,8 @@ const stats = [
 ];
 
 export default function LandingPage() {
-  const { isLoaded: isLoading, isSignedIn, user } = useUser();
-  const isLoaded = !isLoading;
+  const router = useRouter();
+  const { user, isLoaded, isSignedIn } = useUser();
 
   // GSAP refs for hero animations
   const badgeRef = useRef(null);
@@ -102,8 +103,24 @@ export default function LandingPage() {
   const featuresSubheadingRef = useRef(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     const initAnimations = async () => {
-      const { gsap: gsapLib } = await loadGSAP();
+      const { gsap: gsapLib, ScrollTrigger: ScrollTriggerLib } = await loadGSAP();
+
+      if (!isMounted) return;
+
+      // Kill all existing animations and scroll triggers before creating new ones
+      gsapLib.globalTimeline?.clear();
+      ScrollTriggerLib.getAll().forEach(st => st.kill());
+
+      // Reset all animated elements to initial state
+      const elementsToReset = [badgeRef.current, titleRef.current, subtitleRef.current, buttonsRef.current];
+      elementsToReset.forEach(el => {
+        if (el) {
+          gsapLib.set(el, { opacity: 1, y: 0, scale: 1 });
+        }
+      });
 
       const ctx = gsapLib.context(() => {
         // Hero animations
@@ -218,10 +235,17 @@ export default function LandingPage() {
         }
       });
 
-      return () => ctx.revert();
+      return () => {
+        isMounted = false;
+        ctx.revert();
+      };
     };
 
     initAnimations();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (
@@ -230,30 +254,36 @@ export default function LandingPage() {
       <nav className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-border/20 bg-background/80 backdrop-blur-xl shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 gap-2">
-            <Link href="/" className="flex items-center gap-2 min-w-0 shrink">
+            <button onClick={() => window.location.href = "/"} className="flex items-center gap-2 min-w-0 shrink cursor-pointer">
               <Image src={AIEvent} width={32} height={32} alt="AI Event Organizer logo" className="rounded-xl shrink-0" style={{ width: 'auto', height: 'auto' }} />
               <span className="font-bold text-base sm:text-xl bg-linear-to-r from-indigo-600 to-cyan-500 bg-clip-text text-transparent truncate">
                 AI Event Organizer
               </span>
-            </Link>
+            </button>
             <div className="flex items-center gap-2 sm:gap-4 shrink-0">
               <ThemeToggle />
-              {isLoaded && isSignedIn ? (
+              {isSignedIn && user ? (
                 <>
                   <Link href="/dashboard" className="hidden sm:inline-flex">
                     <Button variant="ghost" className="text-foreground/80">Dashboard</Button>
                   </Link>
                   <div className="hidden lg:flex flex-col items-end">
                     <span className="text-sm font-medium text-foreground/80 max-w-[150px] truncate">
-                      {user?.fullName || "User"}
+                      {user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.email || "User"}
                     </span>
                     <span className="text-xs text-muted-foreground max-w-[150px] truncate">
-                      {user?.email}
+                      {user.email}
                     </span>
                   </div>
                   <Link href="/dashboard/settings">
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-cyan-500 flex items-center justify-center text-white cursor-pointer">
-                      {user?.firstName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U"}
+                    <div className="w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-br from-indigo-600 to-cyan-500 flex items-center justify-center text-white cursor-pointer">
+                      {user.profileImageUrl ? (
+                        <img src={user.profileImageUrl} alt="Profile" className="h-full w-full object-cover" />
+                      ) : (
+                        <span className="text-sm font-bold">
+                          {user.firstName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
+                        </span>
+                      )}
                     </div>
                   </Link>
                 </>

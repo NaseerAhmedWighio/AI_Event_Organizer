@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 
-// OpenRouter API configuration
+// OpenRouter API configuration - Optimized for speed
 const openai = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
   baseURL: "https://openrouter.ai/api/v1",
@@ -8,12 +8,16 @@ const openai = new OpenAI({
     "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
     "X-Title": "AI Event Organizer",
   },
-  timeout: 60000, // 60 second timeout
-  maxRetries: 2, // Retry up to 2 times on failure
+  timeout: 30000, // 30 second timeout (reduced from 60s)
+  maxRetries: 1, // Only 1 retry (reduced from 2)
 });
 
-// Default model from environment or fallback
+// Faster model option - using a faster model by default
 const DEFAULT_MODEL = process.env.OPENROUTER_MODEL || "arcee-ai/trinity-large-preview:free";
+// Alternative fast models:
+// - "google/gemini-flash-1.5" (very fast, good quality)
+// - "meta-llama/llama-3.1-70b-instruct" (fast open source)
+// - "mistralai/mistral-large" (good balance)
 
 export interface AIEventPlan {
   schedule: Array<{
@@ -51,56 +55,42 @@ export async function generateEventPlan({
   expectedAttendees?: number;
   model?: string;
 }): Promise<AIEventPlan> {
-  const prompt = `You are an expert event planner. Create a comprehensive event plan for the following event:
+  // Concise prompt for faster generation
+  const prompt = `Create an event plan in JSON format for:
+**${eventTitle}** - ${eventDescription}
+Date: ${eventDate} | Location: ${location} | Category: ${category} | Attendees: ${expectedAttendees || "TBD"}
 
-Event Details:
-- Title: ${eventTitle}
-- Description: ${eventDescription}
-- Date: ${eventDate}
-- Location: ${location}
-- Category: ${category}
-- Expected Attendees: ${expectedAttendees || "Not specified"}
-
-Please provide a detailed event plan in JSON format with the following structure:
+Return ONLY valid JSON with this structure:
 {
-  "schedule": [
-    {
-      "time": "09:00 AM",
-      "activity": "Registration and Welcome Coffee",
-      "duration": 60,
-      "location": "Main Lobby",
-      "notes": "Have name tags ready"
-    }
-  ],
-  "budget": "Detailed budget breakdown with categories (Venue, Catering, Equipment, Marketing, etc.)",
-  "suggestions": "Expert suggestions for making this event successful, including tips on engagement, logistics, and contingency planning",
-  "guestIdeas": ["List of guest types or specific suggestions for who to invite"],
-  "vendorRecommendations": "Recommended types of vendors or services needed for this event",
-  "checklist": [
-    {
-      "task": "Book venue",
-      "completed": false,
-      "priority": "high"
-    }
-  ]
+  "schedule": [{"time": "09:00 AM", "activity": "Registration", "duration": 60, "location": "Lobby", "notes": ""}],
+  "budget": {"Venue": 500, "Catering": 300, "Equipment": 200},
+  "suggestions": "Brief expert tips",
+  "guestIdeas": ["Industry professionals", "Stakeholders"],
+  "vendorRecommendations": "Key vendor types needed",
+  "checklist": [{"task": "Book venue", "completed": false, "priority": "high"}]
 }
 
-Make the plan practical, detailed, and tailored to the event type. Include at least 6-8 schedule items, 5+ budget categories, 5+ guest ideas, and 10+ checklist items.`;
+Rules:
+- 6-8 schedule items with realistic times
+- 5+ budget categories as object
+- 5+ guest ideas
+- 10+ checklist items with priorities (high/medium/low)
+- Be specific and practical`;
 
-  // Retry logic with exponential backoff
-  const maxRetries = 3;
+  // Reduced retries for speed
+  const maxRetries = 2;
   let lastError: Error | null = null;
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      console.log(`[AI Plan] Attempt ${attempt}/${maxRetries} for event: ${eventTitle}`);
-      
+      console.log(`[AI Plan] Attempt ${attempt}/${maxRetries} for: ${eventTitle}`);
+
       const completion = await openai.chat.completions.create({
         model: model,
         messages: [
           {
             role: "system",
-            content: "You are a professional event planning assistant. Always respond with valid JSON that matches the requested structure.",
+            content: "Event planning expert. Return ONLY valid JSON matching the requested structure.",
           },
           {
             role: "user",
@@ -108,7 +98,7 @@ Make the plan practical, detailed, and tailored to the event type. Include at le
           },
         ],
         temperature: 0.7,
-        max_tokens: 2000,
+        max_tokens: 1500, // Reduced from 2000 for faster response
         response_format: { type: "json_object" },
       });
 
@@ -119,18 +109,16 @@ Make the plan practical, detailed, and tailored to the event type. Include at le
 
       const plan = JSON.parse(response) as AIEventPlan;
 
-      // Validate and provide defaults if needed
-      // Handle case where budget might be returned as an object instead of string
+      // Handle budget object conversion
       let budgetString = plan.budget || "Budget not specified";
       if (typeof plan.budget === "object" && plan.budget !== null) {
-        // Convert budget object to formatted string
         budgetString = Object.entries(plan.budget)
           .map(([category, amount]) => `${category}: $${typeof amount === 'number' ? amount.toLocaleString() : amount}`)
           .join('\n');
       }
 
-      console.log(`[AI Plan] Successfully generated plan on attempt ${attempt}`);
-      
+      console.log(`[AI Plan] Success on attempt ${attempt}`);
+
       return {
         schedule: plan.schedule || [],
         budget: budgetString,
@@ -142,40 +130,38 @@ Make the plan practical, detailed, and tailored to the event type. Include at le
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
       console.error(`[AI Plan] Attempt ${attempt} failed:`, lastError.message);
-      
-      // If this is the last attempt, re-throw the error
+
       if (attempt === maxRetries) {
-        console.error(`[AI Plan] All ${maxRetries} attempts failed`);
+        console.error(`[AI Plan] All attempts failed`);
         break;
       }
-      
-      // Wait before retrying (exponential backoff: 2s, 4s, 8s)
-      const waitTime = Math.pow(2, attempt) * 1000;
-      console.log(`[AI Plan] Waiting ${waitTime}ms before retry...`);
+
+      // Shorter wait between retries (1.5s instead of 2s)
+      const waitTime = 1500;
+      console.log(`[AI Plan] Retrying in ${waitTime}ms...`);
       await new Promise(resolve => setTimeout(resolve, waitTime));
     }
   }
 
-  // If we get here, all retries failed
+  // All retries failed
   console.error("[AI Plan] Final error:", lastError);
-  
-  // Provide specific error messages based on error type
+
   if (lastError) {
     if (lastError.message.includes("ECONNRESET") || lastError.message.includes("timeout")) {
-      throw new Error("AI service connection failed. This can happen due to network issues or high demand. Please try again in a few moments.");
+      throw new Error("AI service connection failed. Please try again.");
     }
     if (lastError.message.includes("401") || lastError.message.includes("Unauthorized")) {
-      throw new Error("Invalid AI API key. Please check your OpenRouter configuration.");
+      throw new Error("Invalid AI API key. Check your configuration.");
     }
     if (lastError.message.includes("429") || lastError.message.includes("rate limit")) {
-      throw new Error("AI service rate limit exceeded. Please wait a moment and try again.");
+      throw new Error("Rate limit exceeded. Wait a moment and try again.");
     }
     if (lastError.message.includes("500") || lastError.message.includes("503")) {
-      throw new Error("AI service is temporarily unavailable. Please try again later.");
+      throw new Error("AI service unavailable. Try again later.");
     }
   }
-  
-  throw new Error("Failed to generate AI event plan. Please check your internet connection and try again.");
+
+  throw new Error("Failed to generate plan. Check connection and try again.");
 }
 
 export async function optimizeEventSchedule({

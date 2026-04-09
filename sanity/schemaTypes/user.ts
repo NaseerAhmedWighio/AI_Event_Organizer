@@ -36,7 +36,23 @@ export default {
     {
       name: 'profileImageUrl',
       title: 'Profile Image URL',
-      type: 'url',
+      type: 'text',
+      description: 'Base64 encoded image or URL',
+    },
+    {
+      name: 'role',
+      title: 'Role',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Admin', value: 'admin' },
+          { title: 'Sub-Admin', value: 'subadmin' },
+          { title: 'User', value: 'user' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'user',
+      description: 'User role for access control',
     },
     {
       name: 'createdAt',

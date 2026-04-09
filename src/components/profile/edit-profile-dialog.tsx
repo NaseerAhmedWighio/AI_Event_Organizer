@@ -61,8 +61,8 @@ export function EditProfileDialog() {
     }
   };
 
-  const handleImageUpload = async (): Promise<boolean> => {
-    if (!profileImage || !user) return false;
+  const handleImageUpload = async (): Promise<string | null> => {
+    if (!profileImage || !user) return null;
 
     setIsUploading(true);
     try {
@@ -70,27 +70,22 @@ export function EditProfileDialog() {
       const reader = new FileReader();
       reader.readAsDataURL(profileImage);
 
-      await new Promise<void>((resolve, reject) => {
+      return await new Promise<string | null>((resolve) => {
         reader.onload = async () => {
           try {
             const base64String = reader.result as string;
-
-            // TODO: Implement profile image upload to Sanity or cloud storage
-            // For now, just store the base64 string locally
-            console.log("Profile image uploaded (base64 stored locally)");
-            resolve();
+            console.log("Profile image converted to base64");
+            resolve(base64String);
           } catch (err) {
-            reject(err);
+            console.error("Error converting image:", err);
+            resolve(null);
           }
         };
-        reader.onerror = () => reject(reader.error);
+        reader.onerror = () => {
+          console.error("Error reading file");
+          resolve(null);
+        };
       });
-
-      toast({
-        title: "Success",
-        description: "Profile picture uploaded successfully!",
-      });
-      return true;
     } catch (error) {
       console.error("Error uploading image:", error);
       toast({
@@ -98,7 +93,7 @@ export function EditProfileDialog() {
         description: "Failed to upload image. Please try again.",
         variant: "destructive",
       });
-      return false;
+      return null;
     } finally {
       setIsUploading(false);
     }
@@ -109,28 +104,48 @@ export function EditProfileDialog() {
 
     setIsSaving(true);
     try {
-      // Upload profile image if changed (currently local only)
-      let imageUploaded = false;
+      // Upload profile image if changed
+      let profileImageUrl: string | undefined;
       if (profileImage) {
-        imageUploaded = await handleImageUpload();
+        const base64Image = await handleImageUpload();
+        if (base64Image) {
+          profileImageUrl = base64Image;
+        } else {
+          toast({
+            title: "Upload failed",
+            description: "Failed to upload image. Profile update will continue without image.",
+            variant: "destructive",
+          });
+        }
       }
 
-      // Update user profile (name)
-      await updateUser({
-        firstName: firstName || undefined,
-        lastName: lastName || undefined,
+      // Update user profile via API
+      const response = await fetch('/api/auth/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: firstName || undefined,
+          lastName: lastName || undefined,
+          profileImageUrl: profileImageUrl || user.profileImageUrl,
+        }),
       });
 
-      // If image upload failed, don't continue with other operations
-      if (profileImage && !imageUploaded) {
-        return;
+      if (response.ok) {
+        const data = await response.json();
+        // Update context with new user data
+        if (data.user) {
+          // Trigger a refresh of the user context
+          window.location.reload();
+        }
+        
+        toast({
+          title: "Success",
+          description: "Profile updated successfully!",
+        });
+        setOpen(false);
+      } else {
+        throw new Error('Failed to update profile');
       }
-
-      toast({
-        title: "Success",
-        description: "Profile updated successfully!",
-      });
-      setOpen(false);
     } catch (error) {
       console.error("Error updating profile:", error);
       toast({

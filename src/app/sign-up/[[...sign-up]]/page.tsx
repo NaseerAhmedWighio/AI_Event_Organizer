@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
 import AIEvent from "../../../../public/ai_event-organizers.png";
 import { Button } from "@/components/ui/button";
@@ -69,12 +68,12 @@ export default function SignUpPage() {
       {/* Left side - Branding */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 bg-gradient-to-br from-indigo-600 via-purple-600 to-cyan-600 text-white">
         <div>
-          <Link href="/" className="flex items-center gap-2 min-w-0 shrink">
+          <button onClick={() => window.location.href = "/"} className="flex items-center gap-2 min-w-0 shrink cursor-pointer">
             <Image src={AIEvent} width={32} height={32} alt="AI Event Organizer logo" className="rounded-xl shrink-0" style={{ width: 'auto', height: 'auto' }} />
             <span className="font-bold text-base sm:text-xl text-white">
               AI Event Organizer
             </span>
-          </Link>
+          </button>
         </div>
 
         <div className="space-y-4">
@@ -102,12 +101,12 @@ export default function SignUpPage() {
       <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
         <div className="w-full max-w-md space-y-6">
           <div className="text-center lg:text-left">
-            <Link href="/" className="flex items-center gap-2 min-w-0 shrink mx-auto lg:mx-0">
+            <button onClick={() => window.location.href = "/"} className="flex items-center gap-2 min-w-0 shrink mx-auto lg:mx-0 cursor-pointer">
               <Image src={AIEvent} width={32} height={32} alt="AI Event Organizer logo" className="rounded-xl shrink-0" style={{ width: 'auto', height: 'auto' }} />
               <span className="font-bold text-base sm:text-xl bg-gradient-to-r from-indigo-600 to-cyan-500 bg-clip-text text-transparent truncate">
                 AI Event Organizer
               </span>
-            </Link>
+            </button>
 
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2 mt-4">
               Create your account

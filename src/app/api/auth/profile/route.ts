@@ -51,7 +51,10 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      user: updatedUser,
+      user: {
+        ...updatedUser,
+        role: updatedUser.role || 'user',
+      },
     });
   } catch (error) {
     console.error('Profile update error:', error);

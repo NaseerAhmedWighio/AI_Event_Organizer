@@ -67,9 +67,9 @@ export function ChecklistManager({ planId, eventId, checklist, onUpdate }: Check
     try {
       const result = await markEventAsCompleted(eventId);
       if (result.success) {
-        toast.success("Event Marked as Completed! 🎉", {
+        toast({
+          title: "Event Marked as Completed! 🎉",
           description: "All tasks are done! Your event has been marked as completed.",
-          duration: 5000,
         });
         router.refresh();
         onUpdate?.();

@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
 import { findUserById } from '@/lib/user-db';
 
+const MAIN_ADMIN_EMAIL = 'naseerahmedwighio@gmail.com';
+
+/**
+ * GET /api/admin/check-access
+ * Checks if the current user has admin access (MAIN ADMIN ONLY)
+ */
 export async function GET(request: NextRequest) {
   try {
     // Get token from cookie
@@ -9,7 +15,7 @@ export async function GET(request: NextRequest) {
 
     if (!token) {
       return NextResponse.json(
-        { error: 'Not authenticated' },
+        { isAdmin: false, error: 'Not authenticated' },
         { status: 401 }
       );
     }
@@ -18,7 +24,7 @@ export async function GET(request: NextRequest) {
     const payload = verifyToken(token);
     if (!payload) {
       return NextResponse.json(
-        { error: 'Invalid or expired token' },
+        { isAdmin: false, error: 'Invalid or expired token' },
         { status: 401 }
       );
     }
@@ -27,25 +33,27 @@ export async function GET(request: NextRequest) {
     const user = await findUserById(payload.userId);
     if (!user) {
       return NextResponse.json(
-        { error: 'User not found' },
+        { isAdmin: false, error: 'User not found' },
         { status: 401 }
       );
     }
 
-    // Return user data (without password)
-    const { password, ...userWithoutPassword } = user;
+    // Check admin access
+    const isAdmin = user.role === 'admin' || user.role === 'subadmin';
+    const isSubAdmin = user.role === 'subadmin';
+    const isMainAdmin = user.email === MAIN_ADMIN_EMAIL;
 
     return NextResponse.json({
       success: true,
-      user: {
-        ...userWithoutPassword,
-        role: userWithoutPassword.role || 'user',
-      },
+      isAdmin: isAdmin,
+      isMainAdmin,
+      isSubAdmin,
+      role: user.role || 'user',
     });
   } catch (error) {
-    console.error('Session error:', error);
+    console.error('Admin check error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { isAdmin: false, error: 'Internal server error' },
       { status: 500 }
     );
   }

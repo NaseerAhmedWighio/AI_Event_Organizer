@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EditProfileDialog } from "@/components/profile/edit-profile-dialog";
 import {
   User,
@@ -45,11 +46,18 @@ export default async function SettingsPage() {
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-gray-900">
               <div className="flex items-center gap-4">
-                <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-indigo-600 to-cyan-500 flex items-center justify-center text-white text-xl font-bold">{user.firstName?.[0]?.toUpperCase() || user.email[0].toUpperCase()}</div>
+                <Avatar className="h-16 w-16 rounded-xl ring-2 ring-border">
+                  <AvatarImage src={user.profileImageUrl || ''} alt="Profile" />
+                  <AvatarFallback className="bg-gradient-to-br from-indigo-600 to-cyan-500 text-white text-xl font-bold">
+                    {user.firstName?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
                 <div>
-                  <p className="font-semibold">Your Profile</p>
+                  <p className="font-semibold">
+                    {user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.email}
+                  </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Update your photo and personal details
+                    {user.email}
                   </p>
                 </div>
               </div>

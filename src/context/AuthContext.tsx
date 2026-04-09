@@ -19,10 +19,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasCheckedSession, setHasCheckedSession] = useState(false);
 
   useEffect(() => {
-    // Check for existing session on mount
-    checkSession();
+    // Check for existing session on mount (only once)
+    if (!hasCheckedSession) {
+      checkSession();
+      setHasCheckedSession(true);
+    } else {
+      setIsLoading(false);
+    }
   }, []);
 
   const checkSession = async () => {
@@ -30,7 +36,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await fetch('/api/auth/session');
       if (response.ok) {
         const data = await response.json();
-        setUser(data.user);
+        if (data.user) {
+          setUser(data.user);
+        } else {
+          setUser(null);
+        }
       } else {
         setUser(null);
       }
@@ -132,14 +142,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    // Return default empty state instead of throwing
+    return {
+      user: null,
+      isLoading: false,
+      isSignedIn: false,
+      signIn: async () => ({ success: false, error: 'Not in AuthProvider' }),
+      signUp: async () => ({ success: false, error: 'Not in AuthProvider' }),
+      signOut: async () => {},
+      updateUser: async () => {},
+      refreshUser: async () => {},
+    };
   }
   return context;
 }
 
 // Standard user hook that matches common patterns
 export function useUser() {
-  const { user, isLoading, isSignedIn } = useAuth();
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    // Return default empty state instead of throwing
+    return {
+      user: null,
+      isLoaded: true,
+      isSignedIn: false,
+    };
+  }
+  
+  const { user, isLoading, isSignedIn } = context;
   return {
     user: user ? {
       id: user.id,
@@ -153,4 +183,13 @@ export function useUser() {
     isLoaded: !isLoading,
     isSignedIn,
   };
+}
+
+// Hook to get the display name for a user
+export function useUserDisplayName(user: { firstName?: string; lastName?: string; email: string } | null): string {
+  if (!user) return "User";
+  if (user.firstName && user.lastName) return `${user.firstName} ${user.lastName}`;
+  if (user.firstName) return user.firstName;
+  if (user.lastName) return user.lastName;
+  return user.email;
 }

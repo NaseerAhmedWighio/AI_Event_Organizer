@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,11 +12,15 @@ import {
   Clock,
   Sparkles,
   Lightbulb,
+  CheckCircle,
+  Loader2,
 } from "lucide-react";
 import { GenerateAIPlanButton } from "@/components/dashboard/generate-ai-plan-button";
 import { ChecklistManager } from "@/components/planner/checklist-manager";
 import { AttendeeManager } from "@/components/planner/attendee-manager";
 import { GuestIdeasImporter } from "@/components/planner/guest-ideas-importer";
+import { markEventAsCompleted } from "@/actions/eventActions";
+import { toast } from "sonner";
 
 interface AIPlanSectionProps {
   eventId: string;
@@ -24,6 +29,7 @@ interface AIPlanSectionProps {
     description: string;
     date: string;
     location: string;
+    status?: string;
     category?: string;
     attendees: string[];
     aiPlan?: {
@@ -48,7 +54,9 @@ interface AIPlanSectionProps {
 }
 
 export function AIPlanSection({ eventId, event }: AIPlanSectionProps) {
+  const router = useRouter();
   const [attendees, setAttendees] = useState(event.attendees || []);
+  const [isCompleting, setIsCompleting] = useState(false);
 
   if (!event.aiPlan) {
     return (
@@ -73,6 +81,37 @@ export function AIPlanSection({ eventId, event }: AIPlanSectionProps) {
   const completedTasks = plan.checklist?.filter((i) => i.completed).length || 0;
   const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
+  const handleCompletePlan = async () => {
+    setIsCompleting(true);
+    try {
+      const result = await markEventAsCompleted(eventId);
+      
+      if (result.success) {
+        toast.success("Event Marked as Completed! 🎉", {
+          description: "The event has been moved to completed status.",
+          duration: 4000,
+          icon: <CheckCircle className="h-5 w-5 text-emerald-500" />,
+        });
+        // Redirect to completed events page
+        router.push("/dashboard/events/completed");
+        router.refresh();
+      } else {
+        toast.error("Failed to Complete Event", {
+          description: result.error || "Please try again.",
+          duration: 5000,
+        });
+      }
+    } catch (error) {
+      console.error("Error completing event:", error);
+      toast.error("Error", {
+        description: "An unexpected error occurred. Please try again.",
+        duration: 5000,
+      });
+    } finally {
+      setIsCompleting(false);
+    }
+  };
+
   return (
     <div className="space-y-6" id="ai-plan">
       {/* AI Plan Card */}
@@ -89,7 +128,29 @@ export function AIPlanSection({ eventId, event }: AIPlanSectionProps) {
                 <CardDescription>AI-generated plan for your event</CardDescription>
               </div>
             </div>
-            <GenerateAIPlanButton eventId={eventId} event={event} />
+            <div className="flex gap-2">
+              {event.status === "upcoming" && (
+                <Button
+                  onClick={handleCompletePlan}
+                  disabled={isCompleting}
+                  size="sm"
+                  className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-xl"
+                >
+                  {isCompleting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Completing...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Complete Plan
+                    </>
+                  )}
+                </Button>
+              )}
+              <GenerateAIPlanButton eventId={eventId} event={event} />
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-8">

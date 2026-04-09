@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Calendar,
   LayoutDashboard,
@@ -31,18 +31,19 @@ const navigation = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <>
       {/* Mobile menu button */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 glass">
-        <Link href="/" className="flex items-center gap-2 min-w-0 shrink">
+        <button onClick={() => window.location.href = "/"} className="flex items-center gap-2 min-w-0 shrink cursor-pointer">
           <Image src={AIEvent} width={32} height={32} alt="AI Event Organizer logo" className="rounded-xl shrink-0" style={{ width: 'auto', height: 'auto' }} />
           <span className="font-bold text-base sm:text-xl bg-linear-to-r from-indigo-600 to-cyan-500 bg-clip-text text-transparent truncate">
             AI Event Organizer
           </span>
-        </Link>
+        </button>
         <Button
           variant="ghost"
           size="icon"
@@ -89,15 +90,15 @@ export function Sidebar() {
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex fixed inset-y-0 left-0 w-72 flex-col border-r border-border/50 glass pb-16">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 cursor-pointer">
-          <div className="flex items-center gap-3 p-6 border-b border-border/50 cursor-pointer">
+        <button onClick={() => window.location.href = "/"} className="flex items-center gap-2 cursor-pointer w-full">
+          <div className="flex items-center gap-3 p-6 border-b border-border/50 cursor-pointer w-full">
               <Image src={AIEvent} width={40} height={40} alt="AI Event Organizer logo" className="rounded-xl shrink-0" style={{ width: 'auto', height: 'auto' }} />
             <div>
               <h1 className="font-black text-lg text-foreground">AI Event Organizer</h1>
               <p className="text-xs text-muted-foreground">Plan smarter</p>
             </div>
           </div>
-        </Link>
+        </button>
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">

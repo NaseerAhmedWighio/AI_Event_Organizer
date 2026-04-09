@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyPassword, generateToken, setAuthCookieHeaders, TokenPayload } from '@/lib/auth';
-import { findUserByEmail, updateLastLogin } from '@/lib/user-db';
+import { findUserByEmail, updateLastLogin, updateUser } from '@/lib/user-db';
+
+const MAIN_ADMIN_EMAIL = 'naseerahmedwighio@gmail.com';
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,6 +32,12 @@ export async function POST(request: NextRequest) {
         { error: 'Invalid email or password' },
         { status: 401 }
       );
+    }
+
+    // Auto-promote main admin email to admin role if not already set
+    if (email === MAIN_ADMIN_EMAIL && user.role !== 'admin') {
+      await updateUser(user.id, { role: 'admin' });
+      user.role = 'admin'; // Update local reference
     }
 
     // Update last login

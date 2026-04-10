@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
 import AIEvent from "../../../../public/ai_event-organizers.png";
 import { Button } from "@/components/ui/button";
@@ -47,8 +48,8 @@ export default function SignUpPage() {
       } else {
         setError(result.error || "Registration failed");
       }
-    } catch (err) {
-      setError("An unexpected error occurred");
+    } catch (err: any) {
+      setError(err?.message || "An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }

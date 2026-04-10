@@ -31,10 +31,10 @@ export default function SignInPage() {
         router.push("/dashboard");
         router.refresh();
       } else {
-        setError(result.error || "Login failed");
+        setError(result.error || "Invalid email or password");
       }
-    } catch (err) {
-      setError("An unexpected error occurred");
+    } catch (err: any) {
+      setError(err?.message || "An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }

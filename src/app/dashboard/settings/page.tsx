@@ -1,5 +1,8 @@
-import { getAuthUser } from "@/lib/server-auth";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useAuth, useUser } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,9 +18,36 @@ import {
   LogOut,
   Moon,
   Globe,
+  Loader2,
 } from "lucide-react";
-export default async function SettingsPage() {
-  const user = await getAuthUser();
+
+export default function SettingsPage() {
+  const { user, isLoaded } = useUser();
+  const { signOut } = useAuth();
+  const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await signOut();
+      router.push("/sign-in");
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
+  if (!isLoaded || !user) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -183,18 +213,27 @@ export default async function SettingsPage() {
                   Sign out from your account
                 </p>
               </div>
-              <form action={async () => {
-                "use server";
-                await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/auth/logout`, { method: "POST" });
-                redirect("/sign-in");
-              }}>
-                <Button type="submit" variant="destructive" className="rounded-xl">
-                  <span className="flex items-center gap-2">
-                    <LogOut className="h-4 w-4" />
-                    Sign Out
-                  </span>
-                </Button>
-              </form>
+              <Button 
+                type="button" 
+                variant="destructive" 
+                className="rounded-xl"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+              >
+                <span className="flex items-center gap-2">
+                  {isLoggingOut ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Signing out...
+                    </>
+                  ) : (
+                    <>
+                      <LogOut className="h-4 w-4" />
+                      Sign Out
+                    </>
+                  )}
+                </span>
+              </Button>
             </div>
           </CardContent>
         </Card>

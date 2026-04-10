@@ -1,0 +1,7 @@
+AI Event Organizer
+
+    AI Event Organizer is a full-stack, production-ready SaaS platform that revolutionizes event planning through intelligent automation and AI-powered insights. Built with Next.js 15, TypeScript, Tailwind
+    CSS, and Sanity CMS, it features a custom JWT-based authentication system, real-time analytics dashboard with interactive charts (Recharts), and an AI event planning engine powered by OpenAI. The platform
+    delivers a fully responsive, glass-morphic UI with dark mode support, enabling users to create, manage, and track events with intelligent scheduling, automated budget breakdowns, dynamic checklists, and
+    personalized recommendations. Key features include role-based access control with admin panel, CSV/text analytics export, category performance tracking, notification system, and a review/rating system —
+    all optimized for mobile-first experiences across every screen size.

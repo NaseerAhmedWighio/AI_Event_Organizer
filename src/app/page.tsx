@@ -387,7 +387,7 @@ export default function LandingPage() {
                   </div>
                   <div className="flex-1 mx-1.5 xs:mx-2 sm:mx-4 min-w-0">
                     <div className="bg-background rounded-sm xs:rounded-md px-1.5 xs:px-2 sm:px-3 py-0.5 xs:py-1 sm:py-1.5 text-[8px] xs:text-[10px] sm:text-xs text-muted-foreground truncate font-mono">
-                      ai-event-organizer.app/dashboard
+                      ai-event-organizers.vercel.app//dashboard
                     </div>
                   </div>
                 </div>

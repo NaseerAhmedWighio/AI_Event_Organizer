@@ -36,26 +36,9 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Mobile menu button */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 glass">
-        <button onClick={() => window.location.href = "/"} className="flex items-center gap-2 min-w-0 shrink cursor-pointer">
-          <Image src={AIEvent} width={32} height={32} alt="AI Event Organizer logo" className="rounded-xl shrink-0" style={{ width: 'auto', height: 'auto' }} />
-          <span className="font-bold text-base sm:text-xl bg-linear-to-r from-indigo-600 to-cyan-500 bg-clip-text text-transparent truncate">
-            AI Event Organizer
-          </span>
-        </button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
-      </div>
-
       {/* Mobile menu overlay */}
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-40 bg-background/80 backdrop-blur-sm pt-20">
+        <div className="lg:hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-sm pt-16">
           <div className="flex items-center justify-around p-4 border-b border-border/50">
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">Theme</span>

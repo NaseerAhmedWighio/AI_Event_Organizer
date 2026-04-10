@@ -137,7 +137,7 @@ export default async function EventsPage({
 
           <TabsContent value="all" className="space-y-4">
             {filteredEvents.length > 0 ? (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredEvents.map((event: any) => (
                   <EventCard key={event._id} event={event} />
                 ))}
@@ -152,7 +152,7 @@ export default async function EventsPage({
           </TabsContent>
 
           <TabsContent value="upcoming" className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
               {(filteredEvents || [])
                 .filter((e: any) => e.status === "upcoming")
                 .map((event: any) => (
@@ -175,7 +175,7 @@ export default async function EventsPage({
                     </Button>
                   </Link>
                 </div>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredEvents
                     .filter((e: any) => e.status === "completed")
                     .map((event: any) => (

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@/context/AuthContext";
 import { createEvent } from "@/actions/eventActions";
 import { createAIPlan } from "@/actions/aiPlanActions";
+import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -237,7 +238,8 @@ export default function CreateEventPage() {
   const isDisabled = isSubmitting || !user;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <DashboardLayout>
+      <div className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
         <Link href="/dashboard/events">
@@ -499,5 +501,6 @@ export default function CreateEventPage() {
         </Card>
       </form>
     </div>
+    </DashboardLayout>
   );
 }

@@ -42,15 +42,17 @@ export default async function EventDetailPage({
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+          <div className="flex items-start gap-3 w-full">
             <Link href="/dashboard/events">
-              <Button variant="ghost" size="icon" className="rounded-xl">
+              <Button variant="ghost" size="icon" className="rounded-xl mt-1">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
-            <div>
-              <div className="flex items-center gap-3 mb-1 flex-wrap">
-                <h1 className="text-3xl font-bold">{event.title}</h1>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <h1 className="text-2xl sm:text-3xl font-bold truncate">{event.title}</h1>
+              </div>
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
                 <span
                   className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
                     event.status
@@ -74,39 +76,39 @@ export default async function EventDetailPage({
                   </span>
                 )}
               </div>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-600 dark:text-gray-400 line-clamp-2">
                 {event.description}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
             <Link href={`/dashboard/events/${event._id}/edit`}>
-              <Button variant="outline" className="gap-2 rounded-xl">
+              <Button variant="outline" className="gap-2 rounded-xl w-full sm:w-auto">
                 <Edit className="h-4 w-4" />
                 Edit
               </Button>
             </Link>
             {event.status === "upcoming" && isDatePassed && (
-              <MarkCompletedButton eventId={event._id} variant="default" />
+              <MarkCompletedButton eventId={event._id} variant="default" className="w-full sm:w-auto" />
             )}
-            <DeleteEventButton eventId={event._id} />
+            <DeleteEventButton eventId={event._id} className="w-full sm:w-auto" />
           </div>
         </div>
 
         {/* Date Passed Warning Card */}
         {event.status === "upcoming" && isDatePassed && (
           <Card className="border-2 border-amber-500/50 bg-amber-50/50 dark:bg-amber-950/20 dark:border-amber-500/30">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
                 <div className="h-12 w-12 rounded-xl bg-amber-500/20 flex items-center justify-center flex-shrink-0">
                   <Clock className="h-6 w-6 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-amber-800 dark:text-amber-300 mb-2">
+                  <h3 className="text-base sm:text-lg font-semibold text-amber-800 dark:text-amber-300 mb-2">
                     Event Date Has Passed
                   </h3>
-                  <p className="text-sm text-amber-700 dark:text-amber-400 mb-4">
-                    This event was scheduled for {formatDateTime(event.date)}, but that date has already passed. 
+                  <p className="text-sm text-amber-700 dark:text-amber-400 mb-3 sm:mb-4">
+                    This event was scheduled for {formatDateTime(event.date)}, but that date has already passed.
                     {event.aiPlan?.checklist && event.aiPlan.checklist.length > 0 ? (
                       <> Complete all checklist items and click "Mark as Completed" to move this event to completed status.
                       </>
@@ -114,7 +116,7 @@ export default async function EventDetailPage({
                       " You can mark this event as completed if it has already taken place."
                     )}
                   </p>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <MarkCompletedButton eventId={event._id} variant="outline" />
                   </div>
                 </div>

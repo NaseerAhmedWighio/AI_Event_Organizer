@@ -46,7 +46,7 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
   ];
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-6 grid-cols-2 lg:grid-cols-4">
       {statCards.map((stat, index) => (
         <motion.div
           key={stat.title}
@@ -55,19 +55,19 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
           transition={{ duration: 0.5, delay: index * 0.1 }}
         >
           <Card className="relative overflow-hidden border-0 shadow-lg">
-            <CardContent className="p-8">
-              <div className="flex items-center justify-between">
+            <CardContent className="p-4 md:p-8">
+              <div className="flex items-end md:items-center justify-between">
                 <div>
-                  <p className="text-base font-medium text-muted-foreground mb-2">
+                  <p className="text-[10px] md:text-base font-medium text-muted-foreground mb-2">
                     {stat.title}
                   </p>
-                  <p className="text-4xl font-bold">{stat.value}</p>
+                  <p className="text-lg md:text-4xl font-bold">{stat.value}</p>
                 </div>
                 <div
-                  className={`h-16 w-16 rounded-2xl ${stat.bgColor} flex items-center justify-center`}
+                  className={`h-10 w-10 md:h-16 md:w-16 rounded-2xl ${stat.bgColor} flex items-center justify-center`}
                 >
                   <div
-                    className={`h-8 w-8 rounded-lg bg-linear-to-br ${stat.gradient} flex items-center justify-center`}
+                    className={`h-8 w-8 scale-75 md:scale-100 rounded-lg bg-linear-to-br ${stat.gradient} flex items-center justify-center`}
                   >
                     <stat.icon className="h-5 w-5 text-white" />
                   </div>

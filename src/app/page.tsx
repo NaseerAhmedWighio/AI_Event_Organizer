@@ -102,6 +102,17 @@ export default function LandingPage() {
   const featuresHeadingRef = useRef(null);
   const featuresSubheadingRef = useRef(null);
 
+  // Check if user is authenticated (from localStorage or session)
+  const isAuthenticated = isSignedIn || !!user;
+
+  const handleStartPlanning = () => {
+    if (isAuthenticated) {
+      router.push("/dashboard");
+    } else {
+      router.push("/sign-up");
+    }
+  };
+
   useEffect(() => {
     let isMounted = true;
 
@@ -342,12 +353,12 @@ export default function LandingPage() {
 
           {/* Buttons */}
           <div ref={buttonsRef} className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16 w-full sm:w-auto px-4 sm:px-0">
-            <Link href="/sign-up" className="w-full sm:w-auto">
+            <button onClick={handleStartPlanning} className="w-full sm:w-auto">
               <Button size="lg" className="text-base px-6 sm:px-8 h-11 sm:h-12 w-full sm:w-auto">
                 Start Planning Free
                 <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
-            </Link>
+            </button>
             <Link href="#how-it-works" className="w-full sm:w-auto">
               <Button
                 variant="outline"

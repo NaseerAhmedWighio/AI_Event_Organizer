@@ -109,7 +109,7 @@ export default function AIAssistantPage() {
                 />
               </div>
 
-              <div className="grid sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="eventType">Event Type</Label>
                   <Select
@@ -229,9 +229,9 @@ export default function AIAssistantPage() {
                     {result.schedule.map((item: any, index: number) => (
                       <div
                         key={index}
-                        className="flex items-start gap-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-900"
+                        className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-900"
                       >
-                        <div className="text-sm font-medium text-indigo-600 min-w-[100px]">
+                        <div className="text-sm font-medium text-indigo-600 min-w-[80px] sm:min-w-[100px]">
                           {item.time}
                         </div>
                         <div className="flex-1">
@@ -272,7 +272,7 @@ export default function AIAssistantPage() {
                     ) : typeof result.budget === "object" && result.budget !== null ? (
                       <div className="space-y-2">
                         {Object.entries(result.budget).map(([category, amount]) => (
-                          <div key={category} className="flex justify-between items-center">
+                          <div key={category} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
                             <span className="font-medium">{category}</span>
                             <span className="text-emerald-700 dark:text-emerald-300 font-semibold">
                               ${typeof amount === 'number' ? amount.toLocaleString() : String(amount)}

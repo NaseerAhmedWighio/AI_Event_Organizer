@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Calendar, CheckCircle, Clock, Sparkles, ArrowRight, Plus, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { formatDate, formatDateTime, getStatusColor } from "@/lib/utils";
 import { EventCard } from "@/components/dashboard/event-card";
 import { DashboardStats } from "@/components/dashboard/dashboard-stats";
 
@@ -69,7 +68,7 @@ export default async function DashboardPage() {
             </div>
 
             {upcomingEvents && upcomingEvents.length > 0 ? (
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 {upcomingEvents.slice(0, 4).map((event: any) => (
                   <EventCard key={event._id} event={event} />
                 ))}

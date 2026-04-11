@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { hashPassword, generateToken, generateUserId, setAuthCookieHeaders, TokenPayload } from '@/lib/auth';
+import { hashPassword, generateToken, generateUserId, TokenPayload } from '@/lib/auth';
 import { findUserByEmail, createUser, StoredUser } from '@/lib/user-db';
 
 export async function POST(request: NextRequest) {
@@ -61,11 +61,16 @@ export async function POST(request: NextRequest) {
       user: userWithoutPassword,
     });
 
-    // Set auth cookie
-    const headers = setAuthCookieHeaders(token);
-    Object.entries(headers).forEach(([key, value]) => {
-      response.headers.set(key, value);
+    // Set auth cookie using Next.js cookies API
+    response.cookies.set('auth-token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 30 * 24 * 60 * 60, // 30 days
+      path: '/',
     });
+
+    console.log('Registration successful, cookie set for user:', email);
 
     return response;
   } catch (error) {

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { clearAuthCookieHeader } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,10 +7,13 @@ export async function POST(request: NextRequest) {
       message: 'Logged out successfully',
     });
 
-    // Clear auth cookie
-    const headers = clearAuthCookieHeader();
-    Object.entries(headers).forEach(([key, value]) => {
-      response.headers.set(key, value);
+    // Clear auth cookie using Next.js cookies API
+    response.cookies.set('auth-token', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 0,
+      path: '/',
     });
 
     return response;

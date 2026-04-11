@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import AIEvent from "../../../../public/ai_event-organizers.png";

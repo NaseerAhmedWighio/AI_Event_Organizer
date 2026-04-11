@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyPassword, generateToken, setAuthCookieHeaders, TokenPayload } from '@/lib/auth';
+import { verifyPassword, generateToken, TokenPayload } from '@/lib/auth';
 import { findUserByEmail, updateLastLogin, updateUser } from '@/lib/user-db';
 
 const MAIN_ADMIN_EMAIL = 'naseerahmedwighio@gmail.com';
@@ -58,11 +58,16 @@ export async function POST(request: NextRequest) {
       user: userWithoutPassword,
     });
 
-    // Set auth cookie
-    const headers = setAuthCookieHeaders(token);
-    Object.entries(headers).forEach(([key, value]) => {
-      response.headers.set(key, value);
+    // Set auth cookie using Next.js cookies API
+    response.cookies.set('auth-token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 30 * 24 * 60 * 60, // 30 days
+      path: '/',
     });
+
+    console.log('Login successful, cookie set for user:', user.email);
 
     return response;
   } catch (error) {
